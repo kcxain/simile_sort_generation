@@ -1,4 +1,9 @@
 old-code/
+data/
 *.txt
 *.json
 .idea/
+__pycache__
+*.out
+*.err
+output/

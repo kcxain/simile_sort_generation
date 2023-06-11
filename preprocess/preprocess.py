@@ -106,8 +106,26 @@ def process_data():
             d[key]['vehicle_isa_replace'] = [sentence]
         all_vehicle_isa_replace.append(sentence)
     write_json('./SPGC_data.json', d)
-    write_four_level(d, all_vehicle_isa_replace)
+    generate_dev(d)
+    # write_four_level(d, all_vehicle_isa_replace)
 
+def generate_dev(d):
+    new_d = {}
+    for key in d.keys():
+        vehicle_random_replace = d[key]['vehicle_random_replace']
+        property_random_replace = d[key]['property_random_replace']
+        single_random_replace = vehicle_random_replace + property_random_replace
+        single_random_replace = random.sample(single_random_replace, 1)
+        vehicle_isa_replace = d[key]['vehicle_isa_replace']
+        if len(vehicle_isa_replace) > 0:
+            vehicle_isa_replace = random.sample(d[key]['vehicle_isa_replace'], 1)
+        new_d[key] = {
+            'positive': d[key]['positive'],
+            'vehicle_isa_replace': vehicle_isa_replace,
+            'single_random_replace': single_random_replace,
+            'both_random_replace': d[key]['both_random_replace'],
+        }
+    write_dev_json('./dataset_no_c', new_d)
 
 def write_four_level(d, all_vehicle_isa_replace):
     new_d = {}
@@ -115,13 +133,13 @@ def write_four_level(d, all_vehicle_isa_replace):
         vehicle_random_replace = d[key]['vehicle_random_replace']
         property_random_replace = d[key]['property_random_replace']
         single_random_replace = vehicle_random_replace + property_random_replace
-        single_random_replace = random.sample(single_random_replace, num_simile)
+        single_random_replace = random.sample(single_random_replace, 1)
         # TODO 没有 isa 怎么办？
         vehicle_isa_replace = d[key]['vehicle_isa_replace']
         if len(vehicle_isa_replace) > num_simile:
             vehicle_isa_replace = random.sample(d[key]['vehicle_isa_replace'], num_simile)
         else:
-            vehicle_isa_replace.append(random.sample(all_vehicle_isa_replace, num_simile - len(vehicle_isa_replace)))
+            vehicle_isa_replace.extend(random.sample(all_vehicle_isa_replace, num_simile - len(vehicle_isa_replace)))
         # ALL_SIMILE_TYPES = [
         #     'positive',  # 0
         #     'vehicle_isa_replace',  # 1
@@ -130,7 +148,7 @@ def write_four_level(d, all_vehicle_isa_replace):
         #     'both_random_replace'  # 3
         # ]
         new_d[key] = {
-            'positive': d[key]['positive'] * num_simile,
+            'positive': d[key]['positive'],
             'vehicle_isa_replace': vehicle_isa_replace,
             'single_random_replace': single_random_replace,
             'both_random_replace': d[key]['both_random_replace'],
@@ -158,14 +176,28 @@ def write_json(path, d):
             json.dump(d[key], f)
             f.write('\n')
 
+def write_dev_json(path, d):
+    train_data = load_from_json('./dataset/SPGC/train.json')
+    positives = [key['positive'][0] for key in train_data]
+    print(positives)
+    with open(path + '/SPGC/dev.json', 'w') as f_dev:
+        for key in d.keys():
+            if d[key]['positive'][0] in positives:
+                continue
+            if len(d[key]['vehicle_isa_replace']) == 0:
+                continue
+            json.dump(d[key], f_dev)
+            f_dev.write('\n')
 
 def write_split_json(path, d):
-    with open(path + '/train.json', 'w') as f_train:
-        with open(path + '/test.json', 'w') as f_test:
-            with open(path + '/dev.json', 'w') as f_dev:
+    with open(path + '/SPGC/train.json', 'w') as f_train:
+        with open(path + '/SPGC/test.json', 'w') as f_test:
+            with open(path + '/SPGC/dev.json', 'w') as f_dev:
                 for key in d.keys():
                     n = random.random()
                     if n < 0.1:
+                        if len(d[key]['vehicle_isa_replace']) == 0:
+                            continue
                         json.dump(d[key], f_dev)
                         f_dev.write('\n')
                     elif n < 0.2:

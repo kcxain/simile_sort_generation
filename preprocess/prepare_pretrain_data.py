@@ -47,9 +47,9 @@ def parse_opt():
     return args
 
 
-def get_response_types(response_types_str):
+def get_simile_types(simile_types_str):
     response_types = []
-    for type_str in response_types_str.split('+'):
+    for type_str in simile_types_str.split('+'):
         type_idx = int(type_str) - 1
         response_type = ALL_SIMILE_TYPES[type_idx]
         response_types.append(response_type)
@@ -63,11 +63,11 @@ if __name__ == '__main__':
     args = parse_opt()
     input_dir_path = os.path.join('./dataset', args.src_dataset)
     output_dir_path = os.path.join('../data', args.tgt_dataset)
-    response_types = get_response_types(args.response_types)
+    simile_types = get_simile_types(args.simile_types)
     processor = SimileMLRLossProcessor(
         input_dir_path=input_dir_path,
         output_dir_path=output_dir_path,
-        simile_types=response_types,
+        simile_types=simile_types,
         max_seq_length=args.max_seq_length)
     processor.prepare()
     # processor.analyze()

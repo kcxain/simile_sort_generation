@@ -8,14 +8,6 @@ def parse_eval_opt():
         '--eval_data_dir_path',
         help='The path of the human judgement data directory.')
     parser.add_argument(
-        '--eval_mode',
-        choices=['mix', 'separate'],
-        help='Evaluation mode (currently supports `mix` / `separate`).')
-    parser.add_argument(
-        '--datasets',
-        nargs='+',
-        help='Human judgement datasets for evaluating metrics.')
-    parser.add_argument(
         '--model',
         choices=['bert_metric'],
         help='Model name (currently supports `bert_metric`).')
@@ -40,7 +32,7 @@ def parse_eval_opt():
         '--max_seq_length',
         type=int,
         default=128,
-        help='The max sequence length of the context-response pair.')
+        help='The max sequence length of the simile sentence.')
 
     args = parser.parse_args()
     return args
@@ -51,8 +43,8 @@ def parse_pretrain_opt():
     # general settings
     parser.add_argument(
         '--dataset',
-        choices=['dailydialog_plusplus_mlr'],
-        help='Dataset name (currently supports `dailydialog_plusplus_mlr`).')
+        choices=['SPGC_mlr'],
+        help='Dataset name (currently supports `SPGC_mlr`).')
     parser.add_argument(
         '--model',
         choices=['bert_metric'],
@@ -76,7 +68,7 @@ def parse_pretrain_opt():
         '--max_seq_length',
         type=int,
         default=128,
-        help='The max sequence length of the context-response pair.')
+        help='The max sequence length of the simile sentence.')
 
     # data settings
     parser.add_argument(
@@ -226,7 +218,7 @@ def parse_finetune_opt():
         '--max_seq_length',
         type=int,
         default=128,
-        help='The max sequence length of the context-response pair.')
+        help='The max sequence length of the simile sentence.')
 
     # data settings
     parser.add_argument(
@@ -295,7 +287,7 @@ def parse_finetune_opt():
         help='The output logging level.')
     parser.add_argument(
         '--pretrained_model_name',
-        choices=['bert-base-uncased'],
+        choices=['./model/bert-base-uncased'],
         help='The name of the pretrained model.')
 
     args = parser.parse_args()
